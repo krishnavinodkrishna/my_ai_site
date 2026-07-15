@@ -19,6 +19,8 @@ export default function ProductDetailPage({ params }: PageProps) {
 
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [activeImg, setActiveImg] = useState(0);
+  const [selectedSize, setSelectedSize] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -45,9 +47,6 @@ export default function ProductDetailPage({ params }: PageProps) {
   const images: string[] = product.gallery && product.gallery.length > 0
     ? product.gallery
     : [product.imageUrl];
-
-  const [activeImg, setActiveImg] = useState(0);
-  const [selectedSize, setSelectedSize] = useState("");
 
   const sizes = ["XS", "S", "M", "L", "XL"];
 
