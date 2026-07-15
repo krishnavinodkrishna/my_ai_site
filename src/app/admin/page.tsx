@@ -118,7 +118,7 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody>
-              {RECENT_ORDERS.map((order, i) => (
+              {RECENT_ORDERS.map((order) => (
                 <tr key={order.id} className="border-b border-white/5 hover:bg-white/2 transition-colors">
                   <td className="px-6 py-4 text-xs font-mono text-white/60">{order.id}</td>
                   <td className="px-6 py-4">
