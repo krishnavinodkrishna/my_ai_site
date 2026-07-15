@@ -6,8 +6,24 @@ import { useLead } from "@/lead";
 import { Reveal } from "./Reveal";
 import { ImagePlaceholder } from "./Placeholders";
 
+import { useState, useEffect } from "react";
+
 export function ProductGrid() {
   const { openModal } = useLead();
+  const [arrivals, setArrivals] = useState<any[]>(NEW_ARRIVALS);
+  const [bestSellers, setBestSellers] = useState<any[]>(BEST_SELLERS);
+
+  useEffect(() => {
+    async function load() {
+      const { getProductsAction } = await import("@/app/actions/products");
+      const res = await getProductsAction();
+      if (res.ok && res.products) {
+        setArrivals(res.products.filter((p: any) => p.type === "new"));
+        setBestSellers(res.products.filter((p: any) => p.type === "best"));
+      }
+    }
+    load();
+  }, []);
 
   return (
     <section className="py-20 bg-brand-beige">
@@ -35,20 +51,22 @@ export function ProductGrid() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {NEW_ARRIVALS.map((product, idx) => (
+            {arrivals.map((product, idx) => (
               <Reveal key={product.id} direction="up" delay={idx * 0.05 + 0.1}>
                 <div className="group bg-white rounded-2xl p-4 border border-brand-rose/10 hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
-                  <div className="relative h-64 bg-brand-beige rounded-xl overflow-hidden mb-4 flex items-center justify-center">
-                    {product.imageUrl && !product.imageUrl.includes("/images/products/") ? (
-                      <img src={product.imageUrl} alt={product.title} className="w-full h-full object-cover" />
-                    ) : (
-                      <ImagePlaceholder type={product.title} className="w-32 h-32 object-contain" />
-                    )}
-                    <button onClick={openModal} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white flex items-center justify-center text-zinc-400 hover:text-red-500 shadow transition-colors cursor-pointer">
-                      ♥
-                    </button>
-                  </div>
-                  <h3 className="text-sm font-bold text-brand-green mb-1">{product.title}</h3>
+                  <Link href={`/product/${product.id}`} className="block">
+                    <div className="relative h-64 bg-brand-beige rounded-xl overflow-hidden mb-4 flex items-center justify-center">
+                      {product.imageUrl && !product.imageUrl.includes("/images/products/") ? (
+                        <img src={product.imageUrl} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      ) : (
+                        <ImagePlaceholder type={product.title} className="w-32 h-32 object-contain" />
+                      )}
+                      <button onClick={(e) => { e.preventDefault(); openModal(); }} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white flex items-center justify-center text-zinc-400 hover:text-red-500 shadow transition-colors cursor-pointer">
+                        ♥
+                      </button>
+                    </div>
+                    <h3 className="text-sm font-bold text-brand-green mb-1 group-hover:underline underline-offset-2">{product.title}</h3>
+                  </Link>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-sm font-medium text-brand-green">{product.price}</span>
                     <button
@@ -100,17 +118,19 @@ export function ProductGrid() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {BEST_SELLERS.map((product, idx) => (
+            {bestSellers.map((product, idx) => (
               <Reveal key={product.id} direction="up" delay={idx * 0.05 + 0.1}>
                 <div className="group bg-white rounded-2xl p-4 border border-brand-rose/10 hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
-                  <div className="relative h-56 bg-brand-beige rounded-xl overflow-hidden mb-4 flex items-center justify-center">
-                    {product.imageUrl && !product.imageUrl.includes("/images/products/") ? (
-                      <img src={product.imageUrl} alt={product.title} className="w-full h-full object-cover" />
-                    ) : (
-                      <ImagePlaceholder type={product.title} className="w-28 h-28 object-contain" />
-                    )}
-                  </div>
-                  <h3 className="text-sm font-bold text-brand-green mb-1">{product.title}</h3>
+                  <Link href={`/product/${product.id}`} className="block">
+                    <div className="relative h-56 bg-brand-beige rounded-xl overflow-hidden mb-4 flex items-center justify-center">
+                      {product.imageUrl && !product.imageUrl.includes("/images/products/") ? (
+                        <img src={product.imageUrl} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      ) : (
+                        <ImagePlaceholder type={product.title} className="w-28 h-28 object-contain" />
+                      )}
+                    </div>
+                    <h3 className="text-sm font-bold text-brand-green mb-1 group-hover:underline underline-offset-2">{product.title}</h3>
+                  </Link>
                   <p className="text-[10px] text-text-light leading-snug line-clamp-2 mb-3">{product.description}</p>
                   <div className="flex items-center justify-between mt-auto">
                     <span className="text-sm font-medium text-brand-green">{product.price}</span>

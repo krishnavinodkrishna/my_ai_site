@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useState, useEffect } from "react";
 import { notFound } from "next/navigation";
 import { NEW_ARRIVALS, BEST_SELLERS } from "@/content";
 import { Navbar } from "@/components/Navbar";
@@ -17,12 +17,32 @@ export default function ProductDetailPage({ params }: PageProps) {
   const { id } = use(params);
   const { openModal } = useLead();
 
-  const allProducts = [...NEW_ARRIVALS, ...BEST_SELLERS];
-  const product = allProducts.find((p) => p.id === id);
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      const { getProductsAction } = await import("@/app/actions/products");
+      const res = await getProductsAction();
+      const all = res.ok && res.products ? res.products : [...NEW_ARRIVALS, ...BEST_SELLERS];
+      const found = all.find((p: any) => p.id === id);
+      setProduct(found || null);
+      setLoading(false);
+    }
+    load();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-brand-beige flex items-center justify-center">
+        <span className="animate-spin text-brand-green text-2xl">⏳</span>
+      </div>
+    );
+  }
 
   if (!product) notFound();
 
-  const images = product.gallery && product.gallery.length > 0
+  const images: string[] = product.gallery && product.gallery.length > 0
     ? product.gallery
     : [product.imageUrl];
 
@@ -82,7 +102,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                 )}
                 {/* Dot indicators */}
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                  {images.map((_, i) => (
+                  {images.map((_: string, i: number) => (
                     <button
                       key={i}
                       onClick={() => setActiveImg(i)}

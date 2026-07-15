@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, useState, useEffect } from "react";
 import Link from "next/link";
 import { COLLECTION_PAGES, NEW_ARRIVALS, BEST_SELLERS } from "@/content";
 import { Navbar } from "@/components/Navbar";
@@ -32,8 +32,20 @@ export default function CategoryCollectionPage({ params }: PageProps) {
   const collection = COLLECTION_PAGES[catKey as keyof typeof COLLECTION_PAGES];
   const { openModal } = useLead();
 
-  const allProducts = [...NEW_ARRIVALS, ...BEST_SELLERS];
-  const filteredProducts = allProducts.filter((p) => {
+  const [products, setProducts] = useState<any[]>([...NEW_ARRIVALS, ...BEST_SELLERS]);
+
+  useEffect(() => {
+    async function load() {
+      const { getProductsAction } = await import("@/app/actions/products");
+      const res = await getProductsAction();
+      if (res.ok && res.products) {
+        setProducts(res.products);
+      }
+    }
+    load();
+  }, []);
+
+  const filteredProducts = products.filter((p) => {
     const title = p.title.toLowerCase();
     if (catKey === "women") return title.includes("women") || title.includes("dress") || title.includes("earring");
     if (catKey === "men") return title.includes("men") || title.includes("shirt");
