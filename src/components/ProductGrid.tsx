@@ -39,7 +39,11 @@ export function ProductGrid() {
               <Reveal key={product.id} direction="up" delay={idx * 0.05 + 0.1}>
                 <div className="group bg-white rounded-2xl p-4 border border-brand-rose/10 hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
                   <div className="relative h-64 bg-brand-beige rounded-xl overflow-hidden mb-4 flex items-center justify-center">
-                    <ImagePlaceholder type={product.title} className="w-32 h-32 object-contain" />
+                    {product.imageUrl && !product.imageUrl.includes("/images/products/") ? (
+                      <img src={product.imageUrl} alt={product.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <ImagePlaceholder type={product.title} className="w-32 h-32 object-contain" />
+                    )}
                     <button onClick={openModal} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white flex items-center justify-center text-zinc-400 hover:text-red-500 shadow transition-colors cursor-pointer">
                       ♥
                     </button>
@@ -100,7 +104,11 @@ export function ProductGrid() {
               <Reveal key={product.id} direction="up" delay={idx * 0.05 + 0.1}>
                 <div className="group bg-white rounded-2xl p-4 border border-brand-rose/10 hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
                   <div className="relative h-56 bg-brand-beige rounded-xl overflow-hidden mb-4 flex items-center justify-center">
-                    <ImagePlaceholder type={product.title} className="w-28 h-28 object-contain" />
+                    {product.imageUrl && !product.imageUrl.includes("/images/products/") ? (
+                      <img src={product.imageUrl} alt={product.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <ImagePlaceholder type={product.title} className="w-28 h-28 object-contain" />
+                    )}
                   </div>
                   <h3 className="text-sm font-bold text-brand-green mb-1">{product.title}</h3>
                   <p className="text-[10px] text-text-light leading-snug line-clamp-2 mb-3">{product.description}</p>

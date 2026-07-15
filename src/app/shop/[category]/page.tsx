@@ -1,6 +1,7 @@
 "use client";
 
 import { use } from "react";
+import Link from "next/link";
 import { COLLECTION_PAGES, NEW_ARRIVALS, BEST_SELLERS } from "@/content";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -81,13 +82,28 @@ export default function CategoryCollectionPage({ params }: PageProps) {
           {filteredProducts.map((product, idx) => (
             <Reveal key={product.id} direction="up" delay={idx * 0.05 + 0.1}>
               <div className="group bg-white rounded-2xl p-4 border border-brand-rose/10 hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
-                <div className="relative h-64 bg-brand-beige rounded-xl overflow-hidden mb-4 flex items-center justify-center">
-                  <ImagePlaceholder type={product.title} className="w-32 h-32 object-contain" />
-                  <button onClick={openModal} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white flex items-center justify-center text-zinc-400 hover:text-red-500 shadow transition-colors cursor-pointer">
-                    ♥
-                  </button>
-                </div>
-                <h3 className="text-sm font-bold text-brand-green mb-1">{product.title}</h3>
+                <Link href={`/product/${product.id}`} className="block">
+                  <div className="relative h-64 bg-brand-beige rounded-xl overflow-hidden mb-4 flex items-center justify-center">
+                    {product.imageUrl && !product.imageUrl.includes("/images/products/") ? (
+                      <img
+                        src={product.imageUrl}
+                        alt={product.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <ImagePlaceholder type={product.title} className="w-32 h-32 object-contain" />
+                    )}
+                    {product.gallery && product.gallery.length > 1 && (
+                      <span className="absolute bottom-3 left-3 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded-full backdrop-blur-sm">
+                        {product.gallery.length} photos
+                      </span>
+                    )}
+                    <button onClick={(e) => { e.preventDefault(); openModal(); }} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white flex items-center justify-center text-zinc-400 hover:text-red-500 shadow transition-colors cursor-pointer">
+                      ♥
+                    </button>
+                  </div>
+                  <h3 className="text-sm font-bold text-brand-green mb-1 group-hover:underline underline-offset-2">{product.title}</h3>
+                </Link>
                 {product.description && (
                   <p className="text-[10px] text-text-light mb-3 line-clamp-2 leading-snug">{product.description}</p>
                 )}

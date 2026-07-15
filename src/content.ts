@@ -40,6 +40,7 @@ export interface ProductItem {
   imageUrl: string;
   description?: string;
   rating?: number;
+  gallery?: string[];
 }
 
 export interface ReviewItem {
@@ -164,14 +165,23 @@ export const NEW_ARRIVALS: ProductItem[] = [
   {
     id: "new-1",
     title: "Women's Floral Dress",
-    price: "$59",
-    imageUrl: "/images/products/floral-dress.jpg"
+    price: "₹500",
+    imageUrl: "/images/floral-dress.jpg",
+    description: "Elegant floral dress perfect for every occasion. Crafted with premium fabric for a graceful, feminine look.",
+    gallery: [
+      "/images/floral-dress.jpg",
+      "/images/floral-dress-2.jpg",
+      "/images/floral-dress-3.jpg",
+      "/images/floral-dress-4.jpg",
+      "/images/floral-dress-5.jpg",
+      "/images/floral-dress-6.jpg"
+    ]
   },
   {
     id: "new-2",
     title: "Premium Leather Handbag",
-    price: "$129",
-    imageUrl: "/images/products/leather-handbag.jpg"
+    price: "₹2,000",
+    imageUrl: "/images/leather-handbag.jpg"
   },
   {
     id: "new-3",
@@ -214,8 +224,8 @@ export const BEST_SELLERS: ProductItem[] = [
   {
     id: "best-1",
     title: "Women's Party Dress",
-    price: "$99",
-    imageUrl: "/images/products/party-dress.jpg",
+    price: "₹1,500",
+    imageUrl: "/images/party-dress.jpg",
     description: "Premium quality evening dress."
   },
   {
@@ -235,8 +245,8 @@ export const BEST_SELLERS: ProductItem[] = [
   {
     id: "best-4",
     title: "Leather Backpack",
-    price: "$119",
-    imageUrl: "/images/products/leather-backpack.jpg",
+    price: "₹3,000",
+    imageUrl: "/images/leather-backpack.jpg",
     description: "Designed for style and comfort."
   }
 ];
