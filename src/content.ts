@@ -41,6 +41,7 @@ export interface ProductItem {
   description?: string;
   rating?: number;
   gallery?: string[];
+  colors?: Array<{ name: string; hex: string; imageUrl: string }>;
 }
 
 export interface ReviewItem {
@@ -181,7 +182,20 @@ export const NEW_ARRIVALS: ProductItem[] = [
     id: "new-2",
     title: "Premium Leather Handbag",
     price: "₹2,000",
-    imageUrl: "/images/leather-handbag.jpg"
+    imageUrl: "/images/leather-handbag.jpg",
+    description: "Elegant, stylish, and spacious premium leather handbag. Crafted from high-grade leather with meticulous stitching, featuring multiple compartments and a premium finish. Available in multiple exquisite color options to match your personal style.",
+    gallery: [
+      "/images/leather-handbag.jpg",
+      "/images/leather-handbag-maroon.jpg",
+      "/images/leather-handbag-white-brown.jpg",
+      "/images/leather-handbag-white-blue.png"
+    ],
+    colors: [
+      { name: "Cream & Black", hex: "#EAE6DF", imageUrl: "/images/leather-handbag.jpg" },
+      { name: "Burgundy Maroon", hex: "#800020", imageUrl: "/images/leather-handbag-maroon.jpg" },
+      { name: "Vanilla & Tan", hex: "#F3E8DC", imageUrl: "/images/leather-handbag-white-brown.jpg" },
+      { name: "Vanilla & Blue", hex: "#E6ECF4", imageUrl: "/images/leather-handbag-white-blue.png" }
+    ]
   },
   {
     id: "new-3",
@@ -309,6 +323,10 @@ export const COLLECTION_PAGES = {
   accessories: {
     title: "Accessories Collection",
     description: "Complete your look with Necklaces, Rings, Earrings, Bracelets, Sunglasses, Belts, Caps, and Perfumes."
+  },
+  footwear: {
+    title: "Footwear Collection",
+    description: "Step out in style with our premium collection of sneakers, formal shoes, sandals, heels, and boots."
   }
 };
 

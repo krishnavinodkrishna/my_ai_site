@@ -24,7 +24,8 @@ export default function CategoryCollectionPage({ params }: PageProps) {
     catKey !== "men" &&
     catKey !== "watches" &&
     catKey !== "bags" &&
-    catKey !== "accessories"
+    catKey !== "accessories" &&
+    catKey !== "footwear"
   ) {
     notFound();
   }
@@ -51,7 +52,8 @@ export default function CategoryCollectionPage({ params }: PageProps) {
     if (catKey === "men") return title.includes("men") || title.includes("shirt");
     if (catKey === "watches") return title.includes("watch");
     if (catKey === "bags") return title.includes("handbag") || title.includes("backpack");
-    if (catKey === "accessories") return title.includes("sunglass") || title.includes("earring") || title.includes("watch");
+    if (catKey === "accessories") return title.includes("sunglass") || title.includes("earring") || title.includes("watch") || title.includes("wallet") || title.includes("belt");
+    if (catKey === "footwear") return title.includes("sneaker") || title.includes("shoe") || title.includes("boot");
     return true;
   });
 

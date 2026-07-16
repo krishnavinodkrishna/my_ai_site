@@ -26,16 +26,23 @@ export default function ShopPage() {
   }, []);
 
   const filteredProducts = selectedCategory
-    ? products.filter(
-        (p) =>
-          p.title.toLowerCase().includes(selectedCategory.toLowerCase()) ||
-          (selectedCategory === "Women" && p.title.includes("Women")) ||
-          (selectedCategory === "Men" && p.title.includes("Men")) ||
-          (selectedCategory === "Watches" && p.title.includes("Watch")) ||
-          (selectedCategory === "Bags" && p.title.includes("Handbag")) ||
-          (selectedCategory === "Bags" && p.title.includes("Backpack")) ||
-          (selectedCategory === "Footwear" && p.title.includes("Sneaker"))
-      )
+    ? products.filter((p) => {
+        const title = p.title.toLowerCase();
+        const cat = selectedCategory.toLowerCase();
+        
+        // Direct title match
+        if (title.includes(cat)) return true;
+        
+        // Category specific mappings
+        if (cat === "women") return title.includes("women") || title.includes("dress") || title.includes("earring");
+        if (cat === "men") return title.includes("men") || title.includes("shirt");
+        if (cat === "watches") return title.includes("watch");
+        if (cat === "bags") return title.includes("handbag") || title.includes("backpack");
+        if (cat === "footwear" || cat === "shoes") return title.includes("sneaker") || title.includes("shoe") || title.includes("boot");
+        if (cat === "accessories") return title.includes("sunglass") || title.includes("earring") || title.includes("watch") || title.includes("wallet") || title.includes("belt");
+        
+        return false;
+      })
     : products;
 
   return (

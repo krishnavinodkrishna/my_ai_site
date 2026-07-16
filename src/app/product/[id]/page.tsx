@@ -21,6 +21,7 @@ export default function ProductDetailPage({ params }: PageProps) {
   const [loading, setLoading] = useState(true);
   const [activeImg, setActiveImg] = useState(0);
   const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -28,11 +29,37 @@ export default function ProductDetailPage({ params }: PageProps) {
       const res = await getProductsAction();
       const all = res.ok && res.products ? res.products : [...NEW_ARRIVALS, ...BEST_SELLERS];
       const found = all.find((p: any) => p.id === id);
+      
+      if (found) {
+        const localFallback = [...NEW_ARRIVALS, ...BEST_SELLERS].find((p: any) => p.id === id);
+        if (localFallback) {
+          found.gallery = localFallback.gallery || found.gallery;
+          found.colors = localFallback.colors || found.colors;
+        }
+        if (found.colors && found.colors.length > 0) {
+          setSelectedColor(found.colors[0].name);
+        }
+      }
+      
       setProduct(found || null);
       setLoading(false);
     }
     load();
   }, [id]);
+
+  // Dynamically sync selectedColor when activeImg changes
+  useEffect(() => {
+    if (product && product.colors) {
+      const imagesList: string[] = product.gallery && product.gallery.length > 0
+        ? product.gallery
+        : [product.imageUrl];
+      const currentImgUrl = imagesList[activeImg];
+      const matchingColor = product.colors.find((c: any) => c.imageUrl === currentImgUrl);
+      if (matchingColor && matchingColor.name !== selectedColor) {
+        setSelectedColor(matchingColor.name);
+      }
+    }
+  }, [activeImg, product, selectedColor]);
 
   if (loading) {
     return (
@@ -49,6 +76,25 @@ export default function ProductDetailPage({ params }: PageProps) {
     : [product.imageUrl];
 
   const sizes = ["XS", "S", "M", "L", "XL"];
+  
+  const isBagOrAccessory = 
+    product.title.toLowerCase().includes("handbag") || 
+    product.title.toLowerCase().includes("backpack") || 
+    product.title.toLowerCase().includes("watch") || 
+    product.title.toLowerCase().includes("sunglasses") || 
+    product.title.toLowerCase().includes("earrings");
+
+  const getOriginalPrice = (priceStr: string) => {
+    if (!priceStr) return "";
+    const num = parseInt(priceStr.replace(/[^0-9]/g, ""), 10);
+    if (isNaN(num)) return "";
+    const originalVal = num * 2;
+    const symbol = priceStr.startsWith("₹") ? "₹" : "$";
+    if (symbol === "₹") {
+      return `₹${originalVal.toLocaleString("en-IN")}`;
+    }
+    return `${symbol}${originalVal}`;
+  };
 
   return (
     <div className="relative min-h-screen bg-brand-beige text-brand-green selection:bg-brand-green selection:text-brand-beige">
@@ -158,7 +204,7 @@ export default function ProductDetailPage({ params }: PageProps) {
               {/* Price */}
               <div className="flex items-baseline gap-3">
                 <span className="text-3xl font-bold text-brand-green">{product.price}</span>
-                <span className="text-sm text-text-light line-through">₹999</span>
+                <span className="text-sm text-text-light line-through">{getOriginalPrice(product.price)}</span>
                 <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">50% OFF</span>
               </div>
 
@@ -169,26 +215,77 @@ export default function ProductDetailPage({ params }: PageProps) {
                 </p>
               )}
 
+              {/* Color selector */}
+              {product.colors && product.colors.length > 0 && (
+                <div className="border-t border-brand-rose/20 pt-4">
+                  <div className="flex justify-between items-baseline mb-3">
+                    <p className="text-xs font-bold uppercase tracking-widest text-text-light">
+                      Select Color
+                    </p>
+                    {selectedColor && (
+                      <p className="text-[11px] text-brand-green font-semibold">
+                        {selectedColor}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex gap-3">
+                    {product.colors.map((color: any) => (
+                      <button
+                        key={color.name}
+                        onClick={() => {
+                          setSelectedColor(color.name);
+                          const imgIdx = images.indexOf(color.imageUrl);
+                          if (imgIdx !== -1) {
+                            setActiveImg(imgIdx);
+                          }
+                        }}
+                        className="focus:outline-none cursor-pointer"
+                        title={color.name}
+                      >
+                        <span
+                          className={`w-9 h-9 rounded-full border-2 transition-all flex items-center justify-center ${
+                            selectedColor === color.name
+                              ? "border-brand-green scale-110 shadow-md"
+                              : "border-transparent hover:border-brand-green/30"
+                          }`}
+                        >
+                          <span
+                            className="w-7 h-7 rounded-full shadow-inner border border-zinc-200"
+                            style={{ backgroundColor: color.hex }}
+                          />
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Size selector */}
               <div className="border-t border-brand-rose/20 pt-4">
                 <p className="text-xs font-bold uppercase tracking-widest text-text-light mb-3">
                   Select Size
                 </p>
-                <div className="flex gap-2 flex-wrap">
-                  {sizes.map((size) => (
-                    <button
-                      key={size}
-                      onClick={() => setSelectedSize(size)}
-                      className={`w-12 h-12 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
-                        selectedSize === size
-                          ? "border-brand-green bg-brand-green text-brand-beige shadow-md"
-                          : "border-brand-rose/30 text-brand-green hover:border-brand-green"
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
+                {!isBagOrAccessory ? (
+                  <div className="flex gap-2 flex-wrap">
+                    {sizes.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setSelectedSize(size)}
+                        className={`w-12 h-12 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                          selectedSize === size
+                            ? "border-brand-green bg-brand-green text-brand-beige shadow-md"
+                            : "border-brand-rose/30 text-brand-green hover:border-brand-green"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm font-semibold text-brand-green bg-white/50 border border-brand-rose/10 inline-block px-4 py-2.5 rounded-xl">
+                    Medium
+                  </p>
+                )}
               </div>
 
               {/* Image count chip */}
