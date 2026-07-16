@@ -38,6 +38,7 @@ export interface ProductItem {
   rating?: number;
   gallery?: string[];
   type?: string;
+  colors?: Array<{ name: string; hex: string; imageUrl: string }>;
 }
 
 export async function getAllProducts(): Promise<ProductItem[]> {
