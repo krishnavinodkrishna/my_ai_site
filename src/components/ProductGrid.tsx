@@ -56,7 +56,7 @@ export function ProductGrid() {
                 <div className="group bg-white rounded-2xl p-4 border border-brand-rose/10 hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
                   <Link href={`/product/${product.id}`} className="block">
                     <div className="relative h-64 bg-brand-beige rounded-xl overflow-hidden mb-4 flex items-center justify-center">
-                      {product.imageUrl && !product.imageUrl.includes("/images/products/") ? (
+                      {product.imageUrl && !product.imageUrl.includes("default.jpg") ? (
                         <img src={product.imageUrl} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       ) : (
                         <ImagePlaceholder type={product.title} className="w-32 h-32 object-contain" />
@@ -123,7 +123,7 @@ export function ProductGrid() {
                 <div className="group bg-white rounded-2xl p-4 border border-brand-rose/10 hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
                   <Link href={`/product/${product.id}`} className="block">
                     <div className="relative h-56 bg-brand-beige rounded-xl overflow-hidden mb-4 flex items-center justify-center">
-                      {product.imageUrl && !product.imageUrl.includes("/images/products/") ? (
+                      {product.imageUrl && !product.imageUrl.includes("default.jpg") ? (
                         <img src={product.imageUrl} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       ) : (
                         <ImagePlaceholder type={product.title} className="w-28 h-28 object-contain" />

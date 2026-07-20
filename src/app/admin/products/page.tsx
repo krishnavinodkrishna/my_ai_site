@@ -146,7 +146,7 @@ export default function AdminProductsPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-xl overflow-hidden bg-white/5 flex-shrink-0">
-                          {p.imageUrl && !p.imageUrl.includes("/images/products/") ? (
+                          {p.imageUrl && !p.imageUrl.includes("default.jpg") ? (
                             <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-white/20 text-xs font-bold bg-white/5">IMG</div>
