@@ -72,16 +72,18 @@ export async function updateProduct(
   price: string,
   description: string,
   imageUrl?: string,
-  type?: string
+  type?: string,
+  gallery?: string[]
 ): Promise<void> {
   const img = imageUrl || "/images/products/default.jpg";
   const t = type || "new";
+  const g = JSON.stringify(gallery && gallery.length > 0 ? gallery : [img]);
   await db.execute({
     sql: `INSERT INTO products (id, title, price, imageUrl, description, type, gallery) 
           VALUES (?, ?, ?, ?, ?, ?, ?) 
           ON CONFLICT(id) DO UPDATE SET 
-          title=excluded.title, price=excluded.price, imageUrl=excluded.imageUrl, description=excluded.description, type=excluded.type`,
-    args: [id, title, price, img, description, t, JSON.stringify([])],
+          title=excluded.title, price=excluded.price, imageUrl=excluded.imageUrl, description=excluded.description, type=excluded.type, gallery=excluded.gallery`,
+    args: [id, title, price, img, description, t, g],
   });
 }
 
@@ -91,11 +93,13 @@ export async function insertProduct(
   price: string,
   imageUrl: string,
   description: string,
-  type: string
+  type: string,
+  gallery?: string[]
 ): Promise<void> {
+  const g = JSON.stringify(gallery && gallery.length > 0 ? gallery : [imageUrl]);
   await db.execute({
     sql: "INSERT INTO products (id, title, price, imageUrl, description, type, gallery) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    args: [id, title, price, imageUrl, description, type, JSON.stringify([])],
+    args: [id, title, price, imageUrl, description, type, g],
   });
 }
 

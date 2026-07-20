@@ -40,6 +40,7 @@ export default function AdminProductsPage() {
     description: "",
     imageUrl: "",
     type: "new",
+    gallery: [] as string[],
   });
 
   const [error, setError] = useState("");
@@ -84,12 +85,14 @@ export default function AdminProductsPage() {
     setError("");
     setEditProduct(null);
     setImageSourceMode("preset");
+    const initialImg = PRESET_IMAGES[0].url;
     setForm({
       title: "",
       price: "",
       description: "",
-      imageUrl: PRESET_IMAGES[0].url,
+      imageUrl: initialImg,
       type: "new",
+      gallery: [initialImg],
     });
     setShowModal(true);
   }
@@ -99,14 +102,27 @@ export default function AdminProductsPage() {
     setEditProduct(p);
     const isPreset = PRESET_IMAGES.some((img) => img.url === p.imageUrl);
     setImageSourceMode(isPreset ? "preset" : p.imageUrl?.startsWith("data:") ? "upload" : "custom");
+    
+    const existingGallery = p.gallery && p.gallery.length > 0 
+      ? p.gallery 
+      : p.imageUrl ? [p.imageUrl] : [];
+
     setForm({
       title: p.title,
       price: p.price,
       description: p.description ?? "",
       imageUrl: p.imageUrl ?? "",
       type: p.type ?? "new",
+      gallery: existingGallery,
     });
     setShowModal(true);
+  }
+
+  function handleMainImageSelect(url: string) {
+    setForm((prev) => {
+      const newGallery = prev.gallery.includes(url) ? prev.gallery : [url, ...prev.gallery];
+      return { ...prev, imageUrl: url, gallery: newGallery };
+    });
   }
 
   function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -119,12 +135,27 @@ export default function AdminProductsPage() {
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
-          setForm((prev) => ({ ...prev, imageUrl: event.target!.result as string }));
+          const url = event.target.result as string;
+          handleMainImageSelect(url);
           setError("");
         }
       };
       reader.readAsDataURL(file);
     }
+  }
+
+  function addImageToGallery(url: string) {
+    if (!form.gallery.includes(url)) {
+      setForm((prev) => ({ ...prev, gallery: [...prev.gallery, url] }));
+    }
+  }
+
+  function removeImageFromGallery(url: string) {
+    setForm((prev) => {
+      const updated = prev.gallery.filter((g) => g !== url);
+      const newMain = updated.length > 0 ? (updated.includes(prev.imageUrl) ? prev.imageUrl : updated[0]) : "";
+      return { ...prev, gallery: updated, imageUrl: newMain };
+    });
   }
 
   function handleSave() {
@@ -133,6 +164,10 @@ export default function AdminProductsPage() {
       return;
     }
     setError("");
+
+    const finalGallery = form.gallery.length > 0 
+      ? form.gallery 
+      : form.imageUrl ? [form.imageUrl] : [];
 
     startTransition(async () => {
       let res;
@@ -143,7 +178,8 @@ export default function AdminProductsPage() {
           form.price,
           form.description,
           form.imageUrl,
-          form.type
+          form.type,
+          finalGallery
         );
       } else {
         res = await addProductAction(
@@ -151,7 +187,8 @@ export default function AdminProductsPage() {
           form.price,
           form.description,
           form.type,
-          form.imageUrl
+          form.imageUrl,
+          finalGallery
         );
       }
 
@@ -218,7 +255,7 @@ export default function AdminProductsPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/5 bg-white/2">
-                {["Product", "Type", "Price", "Description", "Actions"].map((h) => (
+                {["Product", "Type", "Price", "Gallery", "Actions"].map((h) => (
                   <th key={h} className="text-left px-6 py-3.5 text-[10px] font-bold text-white/40 uppercase tracking-widest">{h}</th>
                 ))}
               </tr>
@@ -229,56 +266,63 @@ export default function AdminProductsPage() {
                   <td colSpan={5} className="px-6 py-12 text-center text-white/30 text-sm">No products found.</td>
                 </tr>
               ) : (
-                filtered.map((p) => (
-                  <tr key={p.id} className="border-b border-white/5 hover:bg-white/2 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl overflow-hidden bg-white/5 flex-shrink-0 border border-white/10">
-                          {p.imageUrl ? (
-                            <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-white/20 text-xs font-bold bg-white/5">IMG</div>
-                          )}
+                filtered.map((p) => {
+                  const gCount = p.gallery ? p.gallery.length : 1;
+                  return (
+                    <tr key={p.id} className="border-b border-white/5 hover:bg-white/2 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-xl overflow-hidden bg-white/5 flex-shrink-0 border border-white/10">
+                            {p.imageUrl ? (
+                              <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-white/20 text-xs font-bold bg-white/5">IMG</div>
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-white text-sm">{p.title}</p>
+                            <p className="text-[10px] text-white/30 font-mono">ID: {p.id}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-semibold text-white text-sm">{p.title}</p>
-                          <p className="text-[10px] text-white/30 font-mono">ID: {p.id}</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${
+                          p.type === "best" 
+                            ? "bg-violet-500/15 text-violet-400 border border-violet-500/20" 
+                            : "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20"
+                        }`}>
+                          {p.type === "best" ? "★ Best Seller" : "✦ New Arrival"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 font-bold text-emerald-400 text-sm">{p.price}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-bold text-white/70 bg-white/5 border border-white/10 px-2 py-1 rounded-lg">
+                            🖼️ {gCount} {gCount === 1 ? "Image" : "Images"}
+                          </span>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${
-                        p.type === "best" 
-                          ? "bg-violet-500/15 text-violet-400 border border-violet-500/20" 
-                          : "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20"
-                      }`}>
-                        {p.type === "best" ? "★ Best Seller" : "✦ New Arrival"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 font-bold text-emerald-400 text-sm">{p.price}</td>
-                    <td className="px-6 py-4 text-xs text-white/50 max-w-xs">
-                      <p className="line-clamp-2">{p.description || "—"}</p>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => openEdit(p)}
-                          disabled={isPending}
-                          className="px-3 py-1.5 text-[10px] font-bold bg-white/5 hover:bg-white/10 text-white/80 border border-white/10 rounded-lg transition-all cursor-pointer disabled:opacity-50"
-                        >
-                          ✏️ Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(p.id)}
-                          disabled={isPending}
-                          className="px-3 py-1.5 text-[10px] font-bold bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg transition-all cursor-pointer disabled:opacity-50"
-                        >
-                          🗑 Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => openEdit(p)}
+                            disabled={isPending}
+                            className="px-3 py-1.5 text-[10px] font-bold bg-white/5 hover:bg-white/10 text-white/80 border border-white/10 rounded-lg transition-all cursor-pointer disabled:opacity-50"
+                          >
+                            ✏️ Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(p.id)}
+                            disabled={isPending}
+                            className="px-3 py-1.5 text-[10px] font-bold bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg transition-all cursor-pointer disabled:opacity-50"
+                          >
+                            🗑 Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -290,7 +334,7 @@ export default function AdminProductsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md px-4 py-6 overflow-y-auto">
           <div className="bg-[#151820] border border-white/10 rounded-2xl p-6 w-full max-w-lg shadow-2xl my-auto">
             <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
-              <span>{editProduct ? "✏️ Edit Product" : "✨ Add New Product"}</span>
+              <span>{editProduct ? "✏️ Edit Product & Gallery" : "✨ Add New Product"}</span>
             </h2>
             <div className="flex flex-col gap-4">
               <div>
@@ -329,11 +373,11 @@ export default function AdminProductsPage() {
                 </div>
               </div>
 
-              {/* IMAGE SELECTION SECTION */}
+              {/* MULTI-IMAGE GALLERY MANAGER */}
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">
-                    Product Image Selection
+                    Product Image Gallery ({form.gallery.length} Images)
                   </label>
                   <div className="flex bg-white/5 p-1 rounded-lg border border-white/5 text-[10px] font-semibold">
                     <button
@@ -366,27 +410,75 @@ export default function AdminProductsPage() {
                   </div>
                 </div>
 
+                {/* CURRENT GALLERY LIST PREVIEW */}
+                {form.gallery.length > 0 && (
+                  <div className="mb-3 p-3 bg-white/5 rounded-xl border border-white/10">
+                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-2">
+                      Active Product Images (Click to set primary, ✖ to remove):
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {form.gallery.map((gUrl, idx) => {
+                        const isMain = form.imageUrl === gUrl;
+                        return (
+                          <div
+                            key={gUrl + idx}
+                            className={`relative group w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+                              isMain ? "border-emerald-500 ring-2 ring-emerald-500/30" : "border-white/10"
+                            }`}
+                          >
+                            <img
+                              src={gUrl}
+                              alt="Gallery Item"
+                              onClick={() => setForm((prev) => ({ ...prev, imageUrl: gUrl }))}
+                              className="w-full h-full object-cover cursor-pointer"
+                            />
+                            {isMain && (
+                              <span className="absolute top-0.5 left-0.5 bg-emerald-500 text-white text-[8px] font-bold px-1 rounded shadow">
+                                Primary
+                              </span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => removeImageFromGallery(gUrl)}
+                              className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-red-500/90 hover:bg-red-600 text-white text-[9px] font-bold flex items-center justify-center shadow transition-transform hover:scale-110"
+                              title="Remove image"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 {/* MODE 1: PRESET GALLERY GRID */}
                 {imageSourceMode === "preset" && (
                   <div className="bg-white/5 border border-white/10 rounded-xl p-3 max-h-48 overflow-y-auto grid grid-cols-4 gap-2">
                     {PRESET_IMAGES.map((img) => {
-                      const selected = form.imageUrl === img.url;
+                      const inGallery = form.gallery.includes(img.url);
                       return (
                         <button
                           key={img.url}
                           type="button"
-                          onClick={() => setForm({ ...form, imageUrl: img.url })}
+                          onClick={() => {
+                            if (inGallery) {
+                              removeImageFromGallery(img.url);
+                            } else {
+                              addImageToGallery(img.url);
+                            }
+                          }}
                           className={`relative group h-20 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
-                            selected
+                            inGallery
                               ? "border-emerald-500 ring-2 ring-emerald-500/30 scale-[0.98]"
-                              : "border-white/10 hover:border-white/30"
+                              : "border-white/10 hover:border-white/30 opacity-70 hover:opacity-100"
                           }`}
                         >
                           <img src={img.url} alt={img.name} className="w-full h-full object-cover" />
                           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-1 text-[9px] text-white font-medium truncate text-center">
                             {img.name}
                           </div>
-                          {selected && (
+                          {inGallery && (
                             <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[9px] font-bold shadow">
                               ✓
                             </div>
@@ -413,29 +505,29 @@ export default function AdminProductsPage() {
                     >
                       <span>📁 Select Image from Device</span>
                     </label>
-                    <p className="text-[10px] text-white/30">PNG, JPG, WEBP up to 2MB</p>
+                    <p className="text-[10px] text-white/30">Select image file to add to product gallery</p>
                   </div>
                 )}
 
                 {/* MODE 3: CUSTOM URL */}
                 {imageSourceMode === "custom" && (
-                  <input
-                    value={form.imageUrl}
-                    onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                    placeholder="https://example.com/image.jpg"
-                    disabled={isPending}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/20 focus:outline-none focus:border-emerald-500/50 transition-all disabled:opacity-50 font-mono text-xs"
-                  />
-                )}
-
-                {/* PREVIEW CONTAINER */}
-                {form.imageUrl && (
-                  <div className="mt-3 flex items-center gap-3 bg-white/5 p-2.5 rounded-xl border border-white/10">
-                    <img src={form.imageUrl} alt="Selected Preview" className="w-12 h-12 object-cover rounded-lg border border-white/10" />
-                    <div>
-                      <p className="text-xs font-bold text-white">Selected Image Active</p>
-                      <p className="text-[10px] text-white/30 font-mono truncate max-w-[260px]">{form.imageUrl}</p>
-                    </div>
+                  <div className="flex gap-2">
+                    <input
+                      value={form.imageUrl}
+                      onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+                      placeholder="https://example.com/image.jpg"
+                      disabled={isPending}
+                      className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/20 focus:outline-none focus:border-emerald-500/50 transition-all disabled:opacity-50 font-mono text-xs"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (form.imageUrl) addImageToGallery(form.imageUrl);
+                      }}
+                      className="px-3 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition-all"
+                    >
+                      + Add
+                    </button>
                   </div>
                 )}
               </div>

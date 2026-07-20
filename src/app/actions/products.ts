@@ -9,14 +9,15 @@ export async function saveProductAction(
   price: string,
   description: string,
   imageUrl?: string,
-  type?: string
+  type?: string,
+  gallery?: string[]
 ) {
   if (!title || !price) {
     return { ok: false, error: "Title and price are required." };
   }
 
   try {
-    await updateProduct(id, title, price, description, imageUrl, type);
+    await updateProduct(id, title, price, description, imageUrl, type, gallery);
     revalidatePath("/", "layout");
     return { ok: true };
   } catch (err) {
@@ -30,7 +31,8 @@ export async function addProductAction(
   price: string,
   description: string,
   type: string,
-  imageUrl?: string
+  imageUrl?: string,
+  gallery?: string[]
 ) {
   if (!title || !price) {
     return { ok: false, error: "Title and price are required." };
@@ -40,7 +42,7 @@ export async function addProductAction(
   const img = imageUrl || "/images/products/default.jpg";
 
   try {
-    await insertProduct(id, title, price, img, description, type || "new");
+    await insertProduct(id, title, price, img, description, type || "new", gallery);
     revalidatePath("/", "layout");
     return { ok: true };
   } catch (err) {

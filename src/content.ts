@@ -202,25 +202,46 @@ export const NEW_ARRIVALS: ProductItem[] = [
     id: "new-3",
     title: "Luxury Wrist Watch",
     price: "$179",
-    imageUrl: "/images/products/luxury-watch.jpg"
+    imageUrl: "/images/products/luxury-watch.jpg",
+    description: "Exquisite analog watch crafted with a stainless steel casing and sapphire glass.",
+    gallery: [
+      "/images/products/luxury-watch.jpg",
+      "/images/products/smart-watch.jpg",
+      "/images/categories/watches.jpg"
+    ]
   },
   {
     id: "new-4",
     title: "White Sneakers",
     price: "$89",
-    imageUrl: "/images/products/white-sneakers.jpg"
+    imageUrl: "/images/products/white-sneakers.jpg",
+    description: "Minimalist street style white sneakers with ultra-cushioned insoles.",
+    gallery: [
+      "/images/products/white-sneakers.jpg",
+      "/images/categories/footwear.jpg"
+    ]
   },
   {
     id: "new-5",
     title: "Sunglasses",
     price: "$49",
-    imageUrl: "/images/products/sunglasses.jpg"
+    imageUrl: "/images/products/sunglasses.jpg",
+    description: "UV-protected classic aviator sunglasses with polarized lenses.",
+    gallery: [
+      "/images/products/sunglasses.jpg",
+      "/images/categories/accessories.jpg"
+    ]
   },
   {
     id: "new-6",
     title: "Gold Earrings",
     price: "$39",
-    imageUrl: "/images/products/gold-earrings.jpg"
+    imageUrl: "/images/products/gold-earrings.jpg",
+    description: "Handcrafted 18k gold-plated statement drop earrings.",
+    gallery: [
+      "/images/products/gold-earrings.jpg",
+      "/images/categories/accessories.jpg"
+    ]
   }
 ];
 
@@ -241,28 +262,47 @@ export const BEST_SELLERS: ProductItem[] = [
     title: "Women's Party Dress",
     price: "₹1,500",
     imageUrl: "/images/party-dress.jpg",
-    description: "Premium quality evening dress."
+    description: "Premium quality evening dress designed for special celebrations.",
+    gallery: [
+      "/images/party-dress.jpg",
+      "/images/floral-dress.jpg",
+      "/images/floral-dress-2.jpg"
+    ]
   },
   {
     id: "best-2",
     title: "Men's Formal Shirt",
     price: "$49",
     imageUrl: "/images/products/formal-shirt.jpg",
-    description: "Perfect for office and casual wear."
+    description: "Perfect for office and casual wear. Crafted from breathable cotton.",
+    gallery: [
+      "/images/products/formal-shirt.jpg",
+      "/images/categories/men.jpg"
+    ]
   },
   {
     id: "best-3",
     title: "Smart Watch",
     price: "$149",
     imageUrl: "/images/products/smart-watch.jpg",
-    description: "Track fitness and stay connected."
+    description: "Track fitness, monitor health stats, and stay connected on the go.",
+    gallery: [
+      "/images/products/smart-watch.jpg",
+      "/images/products/luxury-watch.jpg",
+      "/images/categories/watches.jpg"
+    ]
   },
   {
     id: "best-4",
     title: "Leather Backpack",
     price: "₹3,000",
     imageUrl: "/images/leather-backpack.jpg",
-    description: "Designed for style and comfort."
+    description: "Designed for style, durability, and maximum daily storage comfort.",
+    gallery: [
+      "/images/leather-backpack.jpg",
+      "/images/leather-handbag.jpg",
+      "/images/leather-handbag-maroon.jpg"
+    ]
   }
 ];
 
