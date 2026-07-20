@@ -17,9 +17,11 @@ export function ProductGrid() {
     async function load() {
       const { getProductsAction } = await import("@/app/actions/products");
       const res = await getProductsAction();
-      if (res.ok && res.products) {
-        setArrivals(res.products.filter((p: any) => p.type === "new"));
-        setBestSellers(res.products.filter((p: any) => p.type === "best"));
+      if (res.ok && res.products && res.products.length > 0) {
+        const dbNew = res.products.filter((p: any) => p.type === "new");
+        const dbBest = res.products.filter((p: any) => p.type === "best");
+        if (dbNew.length > 0) setArrivals(dbNew);
+        if (dbBest.length > 0) setBestSellers(dbBest);
       }
     }
     load();

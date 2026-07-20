@@ -39,7 +39,7 @@ export default function CategoryCollectionPage({ params }: PageProps) {
     async function load() {
       const { getProductsAction } = await import("@/app/actions/products");
       const res = await getProductsAction();
-      if (res.ok && res.products) {
+      if (res.ok && res.products && res.products.length > 0) {
         setProducts(res.products);
       }
     }
