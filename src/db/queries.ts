@@ -70,11 +70,18 @@ export async function updateProduct(
   id: string,
   title: string,
   price: string,
-  description: string
+  description: string,
+  imageUrl?: string,
+  type?: string
 ): Promise<void> {
+  const img = imageUrl || "/images/products/default.jpg";
+  const t = type || "new";
   await db.execute({
-    sql: "UPDATE products SET title = ?, price = ?, description = ? WHERE id = ?",
-    args: [title, price, description, id],
+    sql: `INSERT INTO products (id, title, price, imageUrl, description, type, gallery) 
+          VALUES (?, ?, ?, ?, ?, ?, ?) 
+          ON CONFLICT(id) DO UPDATE SET 
+          title=excluded.title, price=excluded.price, imageUrl=excluded.imageUrl, description=excluded.description, type=excluded.type`,
+    args: [id, title, price, img, description, t, JSON.stringify([])],
   });
 }
 

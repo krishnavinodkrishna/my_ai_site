@@ -41,6 +41,7 @@ export interface ProductItem {
   description?: string;
   rating?: number;
   gallery?: string[];
+  type?: string;
   colors?: Array<{ name: string; hex: string; imageUrl: string }>;
 }
 

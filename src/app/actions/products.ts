@@ -7,14 +7,16 @@ export async function saveProductAction(
   id: string,
   title: string,
   price: string,
-  description: string
+  description: string,
+  imageUrl?: string,
+  type?: string
 ) {
   if (!title || !price) {
     return { ok: false, error: "Title and price are required." };
   }
 
   try {
-    await updateProduct(id, title, price, description);
+    await updateProduct(id, title, price, description, imageUrl, type);
     revalidatePath("/", "layout");
     return { ok: true };
   } catch (err) {
