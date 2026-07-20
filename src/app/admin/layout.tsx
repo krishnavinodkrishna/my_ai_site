@@ -23,11 +23,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     const ok = sessionStorage.getItem("admin_authed");
-    if (ok === "true") {
-      setAuthed(true);
-    }
+    setAuthed(ok === "true");
     setLoading(false);
-  }, []);
+  }, [pathname]);
 
   function handleLogout() {
     sessionStorage.removeItem("admin_authed");

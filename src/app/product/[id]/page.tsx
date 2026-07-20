@@ -27,7 +27,8 @@ export default function ProductDetailPage({ params }: PageProps) {
     async function load() {
       const { getProductsAction } = await import("@/app/actions/products");
       const res = await getProductsAction();
-      const all = res.ok && res.products ? res.products : [...NEW_ARRIVALS, ...BEST_SELLERS];
+      const dbProducts = res.ok && res.products && res.products.length > 0 ? res.products : [];
+      const all = [...dbProducts, ...NEW_ARRIVALS, ...BEST_SELLERS];
       const found = all.find((p: any) => p.id === id);
       
       if (found) {

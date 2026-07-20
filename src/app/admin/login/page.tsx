@@ -19,12 +19,12 @@ export default function AdminLoginPage() {
     setTimeout(() => {
       if (email === "admin@maxfashion.com" && password === "admin123") {
         sessionStorage.setItem("admin_authed", "true");
-        router.push("/admin");
+        window.location.href = "/admin";
       } else {
         setError("Invalid email or password.");
         setLoading(false);
       }
-    }, 800);
+    }, 400);
   }
 
   return (
